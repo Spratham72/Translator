@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #cont{
+            display: flex;
+            flex-direction: row;
+            height: 300px;
+            justify-content: center;
+        }
+        #cont >*{
+            margin: 20px;
+            width: 450px;
+        }
+        #cont1{
+            display: flex;
+            flex-direction: row;
+            justify-content:space-between;
+            width: 900px;
+            margin: auto;
+        }
+        textarea{
+            resize: none;
+        }
+        #converted{
+            height: 250px;
+            width: 350px;
+            border: none;
+        }
+        #copy{
+            border: 1px solid black;
+        }
+        textarea:focus, input:focus{
+            outline: none;
+        }
+        #copyimg{
+            width: 20px;
+            /* margin-bottom: 10px; */
+        }
+        #copyDiv{
+            margin-bottom: 50px;
+            cursor: pointer;
+            display:inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div id="cont1">
+        
+        <label>Translate from</label>
+        <select id="language">
+            <option value="en">English</option>
+            <option value="ar">Arabic</option>
+            <option value="zh">Chinese</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="hi">Hindi</option>
+            <option value="id">Indonesian</option>
+            <option value="ga">Irish</option>
+            <option value="it">Italian</option>
+            <option value="ja">Japanese</option>
+            <option value="ko">Korean</option>
+            <option value="pl">Polish</option>
+            <option value="tr">Turkish</option>
+            <option value="vi">Veitnamese</option>
+            <option value="auto">Auto Detect</option>
+        </select>
+        <label>Translate into</label>
+        <select id="translate">
+            <option value="en">English</option>
+            <option value="ar">Arabic</option>
+            <option value="zh">Chinese</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="hi">Hindi</option>
+            <option value="id">Indonesian</option>
+            <option value="ga">Irish</option>
+            <option value="it">Italian</option>
+            <option value="ja">Japanese</option>
+            <option value="ko">Korean</option>
+            <option value="pl">Polish</option>
+            <option value="tr">Turkish</option>
+            <option value="vi">Veitnamese</option>
+            <option value="auto">Auto Detect</option>
+        </select>
+    </div>
+    
+    <div id="cont">
+    <textarea type="text" id='convert' oninput="debounce(translates,2000)"></textarea>
+    <div id="copy">
+        <textarea type="text" id='converted' readonly  ></textarea>
+        <div id="copyDiv" onclick="copy_to_clipboard('converted');">Copy text <img id="copyimg" src="https://cdn-icons-png.flaticon.com/512/178/178921.png" alt=""></span>
+    </div>
+    
+    
+    </div>
+</body>
+<script>
+
+
+
+    function copy_to_clipboard(id)
+{
+    document.getElementById(id).select();
+    document.execCommand('copy');
+}
+    var timerId;
+    async function translates(){
+        var src=document.getElementById("language").value;
+    var targ=document.getElementById("translate").value;
+        var input=document.getElementById("convert").value;
+        console.log(input)
+        try {
+        const res = await fetch("https://libretranslate.de/translate", {
+        method: "POST",
+        body: JSON.stringify({
+            q: input,
+            source: src,
+            target: targ
+        }),
+        headers: { "Content-Type": "application/json" }
+    });
+    let c=await res.json();
+    if(c.translatedText.length==0 ||c.translatedText.length==undefined ){
+        document.getElementById("converted").value=""
+    }
+    document.getElementById("converted").value=c.translatedText
+    } catch (error) {
+    document.getElementById("converted").value=""; 
+        }
+    }
+ 
+    function debounce(func,delay){
+
+        if(timerId){
+            clearTimeout(timerId);
+        }
+        timerId= setTimeout(function(){
+            func();
+        },delay)
+    }
+    
+
+</script>
+</html>
